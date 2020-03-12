@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/conv_cudnn_test.dir/conv_cudnn_test_generated_conv_cudnn.cu.o  -o conv_cudnn_test  -L/nfs/ug/homes-2/c/cheny248/cuda/lib64 -Wl,-rpath,/nfs/ug/homes-2/c/cheny248/cuda/lib64 -rdynamic -Wl,-Bstatic -lcudart_static -Wl,-Bdynamic -lpthread -ldl -lrt -lcudnn -lopencv_core -lopencv_imgproc -lopencv_highgui 
