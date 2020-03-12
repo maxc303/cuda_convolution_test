@@ -2,14 +2,16 @@ cmake_minimum_required(VERSION 2.8.9)
 project (conv_cudnn)
 
 
-
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpic")
 find_package(CUDA QUIET REQUIRED)
 
-
+set(CXXFLAGS
+	-fPIC)
 set(CUDA_HOST_COMPILER 
-"usr/bin/clang++-3.8"
+  usr/bin/clang++-3.8
  )
+
 
 # Pass options to NVCC
 set(
@@ -21,12 +23,13 @@ set(
 # Specify include directories
 include_directories(
     /usr/include/opencv
+	#Modify the path to local cudnn include
     /nfs/ug/homes-2/c/cheny248/cuda/include
     )
 
 # Specify library paths
 link_directories(
-
+	#Modify the path to local cudnn lib
 	/nfs/ug/homes-2/c/cheny248/cuda/lib64
 
     )
