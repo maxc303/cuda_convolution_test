@@ -1,2 +1,2 @@
 
-nvcc -ccbin clang-3.8 conv_cudnn.cu -o cpu_test
+nvcc -ccbin clang-3.8 conv_cpu.cu -o cpu_test
