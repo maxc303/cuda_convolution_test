@@ -22,15 +22,16 @@ set(
 
 # Specify include directories
 include_directories(
-    /usr/include/opencv
+    
 	#Modify the path to local cudnn include
-    /nfs/ug/homes-2/c/cheny248/cuda/include
+	#/usr/include/opencv
+    #/nfs/ug/homes-2/c/cheny248/cuda/include
     )
 
 # Specify library paths
 link_directories(
 	#Modify the path to local cudnn lib
-	/nfs/ug/homes-2/c/cheny248/cuda/lib64
+	#/nfs/ug/homes-2/c/cheny248/cuda/lib64
 
     )
 
