@@ -65,8 +65,12 @@ int main(int argc, char *argv[]) {
   std::cout << "Padded dims is " << height_padded << "x" << width_padded
             << std::endl;
 
-  float *h_input = (float *)image.data;
+ float *h_input = (float *)image.data;
   float *h_output = new float[output_bytes];
+//   float *h_input = new float(image.rows * image.cols * image.channels()); // Dst
+//   float* dataPointer = reinterpret_cast<float*>(image.data); // Src
+// // pointer from, pointer two, size in bytes
+// std::memcpy(h_input, dataPointer, image.rows * image.cols * image.channels() * sizeof(float));
 
   //==================================
   // Write Image to vector
@@ -111,21 +115,26 @@ int main(int argc, char *argv[]) {
 
   int input_idx = 0;
   int output_idx = 0;
+  int input_col = 0;
+  int input_row = 0;
   for (int k = 0; k < kernels; k++) {
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-        h_output[output_idx] = 0;
+        output_idx = i*width*kernels + j*kernels + k;
+        h_output[output_idx] = 0.0;
         // std::cout<< "Looping index "<< output_idx << std::endl;
         // Channel loop
-
         // Kernel loop
-        for (int k_i = -k_width; k_i < k_width; k_i++) {
-          for (int k_j = -k_width; k_j < k_width; k_j++) {
-            if (i + k_i > 0 && i + k_i < height && j + k_j > 0 &&
-                j + k_j < width) {
-              for (int c = 0; c < 3; c++) {
+        for (int c = 0; c < channels; c++) {
+          for (int k_i = -k_width; k_i <= k_width; k_i++) {
+            for (int k_j = -k_width; k_j <= k_width; k_j++) {
+              if (i + k_i >= 0 && i + k_i < height && j + k_j >= 0 &&
+                  j + k_j < width) {
+
                 input_idx =
-                    c * (width * height) + (j + k_j) + (i + k_i) * width;
+                    c + (j + k_j)*channels + (i + k_i)*channels * width;
+
+
                 h_output[output_idx] +=
                     h_input[input_idx] *
                     kernel_template[k_i + k_width][k_j + k_width];
@@ -134,7 +143,7 @@ int main(int argc, char *argv[]) {
           }
         }
 
-        output_idx++;
+       
       }
     }
   }
