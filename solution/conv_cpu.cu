@@ -53,9 +53,10 @@ cv::imwrite(output_filename, output_image);
     //==================================
     int padding = 1;
     int channels = 3;
-    int height =image.cols;
-    int width = image.rows;
-    std::cout << "Image dims is " << height << "x" << width << std::endl;
+    int height =image.rows;
+    int width = image.cols;
+    
+    std::cout << "Image dims (HxW)is " << height << "x" << width << std::endl;
     int height_padded = height + 2*padding;
     int width_padded = width + 2*padding;
     int output_bytes = channels * height* width* sizeof(float);
@@ -101,6 +102,7 @@ cv::imwrite(output_filename, output_image);
       }
     }
   }
+
     int k_size = 3;
     int k_width = (k_size-1)/2;
     //==================================
@@ -110,14 +112,14 @@ cv::imwrite(output_filename, output_image);
     int input_idx = 0;
     int output_idx = 0;
     for (int z = 0; z < channels; z++){
-        for (int i = 0; i < width; i++){
-            for (int j = 0; j < height; j++){
+        for (int i = 0; i < height; i++){
+            for (int j = 0; j < width; j++){
                 //Kernel loop
                 h_output[counter]=0;
                 for(int k_i =-k_width; k_i <k_width;k_i++){
                     for(int k_j =-k_width;k_j <k_width;k_j++){
-                        if(i+k_i>0 && i +k_i < width && j+k_j >0 && j+k_j < height){
-                            input_idx = z *(width*height ) + (j+k_j)*width + (i+k_i);
+                        if(i+k_i>0 && i +k_i < height && j+k_j >0 && j+k_j < width){
+                            input_idx = z *(width*height ) + (j+k_j)+ (i+k_i)*width;
                             h_output[counter] += h_input[input_idx]*kernel_template[k_i+k_width][k_j+k_width];
                         }
                     }
@@ -139,7 +141,7 @@ cv::imwrite(output_filename, output_image);
   std::cout << "Total convolution time: " << timeStampB - timeStampA
             << std::endl;
   std::cout << "Save Output to " << outputfile << std::endl;
-  save_image(outputfile, h_output, width, height);
+  save_image(outputfile, h_output, height, width);
 
 
     return 0;

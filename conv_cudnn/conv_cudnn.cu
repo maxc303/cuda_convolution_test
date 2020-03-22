@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  double timeStampA = getTimeStamp();
+
   // Input Descriptor
   cudnnTensorDescriptor_t input_descriptor;
   checkCUDNN(cudnnCreateTensorDescriptor(&input_descriptor));
@@ -145,6 +145,7 @@ int main(int argc, char *argv[]) {
   cudaMalloc(&d_output, image_bytes);
   cudaMemset(d_output, 0, image_bytes);
 
+  std::cout << "Height and width:" << height << " x " << width << std::endl;
   // Mystery kernel
   const float kernel_template[3][3] = {{1, 1, 1}, {1, -8, 1}, {1, 1, 1}};
 
@@ -164,6 +165,7 @@ int main(int argc, char *argv[]) {
   cudaMemcpy(d_kernel, h_kernel, sizeof(h_kernel), cudaMemcpyHostToDevice);
 
   std::cout << "Start conv" << std::endl;
+  double timeStampA = getTimeStamp();
   const float alpha = 1, beta = 0;
   checkCUDNN(cudnnConvolutionForward(
       cudnn, &alpha, input_descriptor, d_input, kernel_descriptor, d_kernel,
@@ -173,6 +175,7 @@ int main(int argc, char *argv[]) {
   float *h_output = new float[image_bytes];
   cudaMemcpy(h_output, d_output, image_bytes, cudaMemcpyDeviceToHost);
 
+  
   double timeStampB = getTimeStamp();
 
   // Print result
