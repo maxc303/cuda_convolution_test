@@ -1,5 +1,6 @@
 #include "helpers.h"
 
+
 double getTimeStamp() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
