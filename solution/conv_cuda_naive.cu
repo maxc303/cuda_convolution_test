@@ -1,16 +1,18 @@
 #include "helpers.h"
 
 __global__ void conv_cuda( float *input, float *output, int width, int height, float *kernel, int channels,int k_width,int kernels ){
+        //printf("IN cuda \n");
         int k = blockIdx.z; 
         int j = threadIdx.x + blockIdx.x*blockDim.x ;
         int i = threadIdx.y + blockIdx.y*blockDim.y ;
         int output_idx = i*width*kernels + j*kernels + k;
         int input_idx = 0;
-        printf("output index %d\n",output_idx);
+        //printf("output index %d\n",output_idx);
         output[output_idx] = 0.0;
-        // std::cout<< "Looping index "<< output_idx << std::endl;
-        // Channel loop
-        // Kernel loop
+        // input_idx = output_idx;
+        // output[output_idx]=input[input_idx];
+        //Channel loop
+        //Kernel loop
         for (int c = 0; c < channels; c++) {
           for (int k_i = -k_width; k_i <= k_width; k_i++) {
             for (int k_j = -k_width; k_j <= k_width; k_j++) {
@@ -71,7 +73,9 @@ int main(int argc, char *argv[]) {
             << std::endl;
 
   float *h_input = (float *)image.data;
-  float *h_output = new float[output_bytes];
+  //float *h_output = new float[output_bytes];
+  float *h_output;
+  h_output = (float *) malloc( output_bytes ) ;
   float *d_input;
   float *d_output;
   cudaMalloc( (void **) &d_input, input_bytes) ; 
@@ -82,9 +86,9 @@ int main(int argc, char *argv[]) {
       // invoke Kernel
     int bx =32;
     int by =32;
-    dim3 block( bx, by ,3 ) ; // you will want to configure this
-    dim3 grid( (width + block.x-1)/block.x, (height + block.y-1)/block.y) ;
-    printf("Grid : {%d, %d} blocks. Blocks : {%d, %d} threads.\n", grid.x, grid.y, block.x, block.y);
+    dim3 block( bx, by ) ; // you will want to configure this
+    dim3 grid( (width + block.x-1)/block.x, (height + block.y-1)/block.y, 3) ;
+    printf("Grid : {%d, %d, %d} blocks. Blocks : {%d, %d} threads.\n", grid.x, grid.y,grid.z, block.x, block.y);
 
 
   //==================================
@@ -116,6 +120,7 @@ int main(int argc, char *argv[]) {
   printf("Start conv\n");
 
   conv_cuda<<<grid, block>>>( d_input, d_output, width, height, d_kernel, 3,k_width,kernels );
+  cudaDeviceSynchronize();
   cudaMemcpy( h_output, d_output, input_bytes, cudaMemcpyDeviceToHost);
 
   //==================================
