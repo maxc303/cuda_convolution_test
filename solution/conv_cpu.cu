@@ -83,17 +83,16 @@ int main(int argc, char *argv[]) {
 
                 input_idx =
                     c + (j + k_j)*channels + (i + k_i)*channels * width;
-
+ 
 
                 h_output[output_idx] +=
                     h_input[input_idx] *
                     h_kernel[k][c][k_i + k_width][k_j + k_width];
+
               }
             }
           }
         }
-
-       
       }
     }
   }

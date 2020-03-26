@@ -1,18 +1,19 @@
 #include "helpers.h"
 
 __global__ void conv_cuda( float *input, float *output, int width, int height, float *kernel, int channels,int k_width,int kernels ){
-        //printf("IN cuda \n");
+        
         int k = blockIdx.z; 
         int j = threadIdx.x + blockIdx.x*blockDim.x ;
         int i = threadIdx.y + blockIdx.y*blockDim.y ;
         int output_idx = i*width*kernels + j*kernels + k;
         int input_idx = 0;
-        //printf("output index %d\n",output_idx);
+
+        if(i>=height || j>=width){
+          return;
+        }
+
         output[output_idx] = 0.0;
-        // input_idx = output_idx;
-        // output[output_idx]=input[input_idx];
-        //Channel loop
-        //Kernel loop
+
         for (int c = 0; c < channels; c++) {
           for (int k_i = -k_width; k_i <= k_width; k_i++) {
             for (int k_j = -k_width; k_j <= k_width; k_j++) {
@@ -20,7 +21,8 @@ __global__ void conv_cuda( float *input, float *output, int width, int height, f
                   j + k_j < width) {
                 input_idx =
                     c + (j + k_j)*channels + (i + k_i)*channels * width;
-                int kernel_index = k*channels*(2*k_width+1)^2 + c*(2*k_width+1)^2 + (k_i + k_width)* (2*k_width+1)+k_j + k_width;
+           
+                int kernel_index = k*channels*(2*k_width+1)*(2*k_width+1) + c*(2*k_width+1)*(2*k_width+1) + (k_i + k_width)* (2*k_width+1)+k_j + k_width;
                 output[output_idx] +=
                     input[input_idx] * kernel[kernel_index];
                     //h_kernel[k][c][k_i + k_width][k_j + k_width];
@@ -29,7 +31,7 @@ __global__ void conv_cuda( float *input, float *output, int width, int height, f
             }
           }
         }       
-
+       
     return;
  }
 
@@ -53,7 +55,6 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  double timeStampA = getTimeStamp();
 
   //==================================
   // Define I/O sizes
@@ -118,15 +119,18 @@ int main(int argc, char *argv[]) {
   // CPU Convolution 
   //==================================
   printf("Start conv\n");
+  double timeStampA = getTimeStamp();
+
 
   conv_cuda<<<grid, block>>>( d_input, d_output, width, height, d_kernel, 3,k_width,kernels );
   cudaDeviceSynchronize();
+  double timeStampB = getTimeStamp();
+
   cudaMemcpy( h_output, d_output, input_bytes, cudaMemcpyDeviceToHost);
 
   //==================================
   // Collect data
   //==================================
-  double timeStampB = getTimeStamp();
 
   // Print result
   std::cout << "Total convolution time: " << timeStampB - timeStampA

@@ -48,13 +48,13 @@ int main(int argc, char *argv[]) {
   cudnnCreate(&cudnn);
 
   char *outputfile = (char *)"cudnn_out.png";
-  //Check input image name
+  // Check input image name
   if (argc < 2) {
     std::cout << "No file input" << std::endl;
     return 0;
   }
   //
-  //Check if the filename is valid
+  // Check if the filename is valid
   char *filename = argv[1];
   std::cout << argv[1] << std::endl;
   // Load Image
@@ -64,7 +64,6 @@ int main(int argc, char *argv[]) {
     std::cout << "File not exist" << std::endl;
     return 0;
   }
-
 
   // Input Descriptor
   cudnnTensorDescriptor_t input_descriptor;
@@ -163,20 +162,21 @@ int main(int argc, char *argv[]) {
   float *d_kernel;
   cudaMalloc(&d_kernel, sizeof(h_kernel));
   cudaMemcpy(d_kernel, h_kernel, sizeof(h_kernel), cudaMemcpyHostToDevice);
+  const float alpha = 1, beta = 0;
 
   std::cout << "Start conv" << std::endl;
   double timeStampA = getTimeStamp();
-  const float alpha = 1, beta = 0;
   checkCUDNN(cudnnConvolutionForward(
       cudnn, &alpha, input_descriptor, d_input, kernel_descriptor, d_kernel,
       convolution_descriptor, convolution_algorithm, d_workspace,
       workspace_bytes, &beta, output_descriptor, d_output));
 
+  cudaDeviceSynchronize();
+  double timeStampB = getTimeStamp();
   float *h_output = new float[image_bytes];
   cudaMemcpy(h_output, d_output, image_bytes, cudaMemcpyDeviceToHost);
 
-  
-  double timeStampB = getTimeStamp();
+
 
   // Print result
   std::cout << "Total convolution time: " << timeStampB - timeStampA
