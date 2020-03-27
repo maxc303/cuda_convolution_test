@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  double timeStampA = getTimeStamp();
+
 
   //==================================
   // Define I/O sizes
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
   int input_idx = 0;
   int output_idx = 0;
-
+  double timeStampA = getTimeStamp();
   for (int k = 0; k < kernels; k++) {
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {

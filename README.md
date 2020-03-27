@@ -14,8 +14,14 @@ CPU: i7-6700HQ<br />
 
 <h2>CUDA naive Solution</h2> 
 on GTX960m kernel time<br />
-4000x3000.jpg: 0.176 <br />
+4000x3000.jpg: 0.1769 <br />
 2000x1000.jpg: 0.0346<br /> 
 780x585.jpg: 0.00728 <br />
+
+<h2>CUDA constant memory Solution</h2> 
+on GTX960m kernel time<br />
+4000x3000.jpg: 0.1725 <br />
+2000x1000.jpg: 0.0338<br /> 
+780x585.jpg: 0.00706 <br />
 
 
