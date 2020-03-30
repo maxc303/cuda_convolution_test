@@ -24,4 +24,17 @@ on GTX960m kernel time<br />
 2000x1000.jpg: 0.0338<br /> 
 780x585.jpg: 0.00706 <br />
 
+<h2>CUDA register output, no padding</h2> 
+on GTX960m kernel time<br />
+4000x3000.jpg: 0.0799 <br />
+2000x1000.jpg: 0.0129<br /> 
+780x585.jpg: 0.00304 <br />
+
+<h2>CUDA register output, 0.0812</h2> 
+on GTX960m kernel time<br />
+4000x3000.jpg: 0.0813 <br />
+2000x1000.jpg: 0.0158<br /> 
+780x585.jpg: 0.00331 <br />
+
+
 
