@@ -1,5 +1,7 @@
 #include "helpers.h"
-
+/*
+This convolution operation uses constant memory for kernel(filter),with register output
+*/
 
 __constant__ float ckernel[81];
 __global__ void conv_cuda( float *input, float *output, int width, int height, float *kernel, int channels,int k_width,int kernels ){
@@ -13,7 +15,7 @@ __global__ void conv_cuda( float *input, float *output, int width, int height, f
         if(i>=height || j>=width){
           return;
         }
-
+        float tmp_output=0;
         output[output_idx] = 0.0;
 
         for (int c = 0; c < channels; c++) {
@@ -25,7 +27,7 @@ __global__ void conv_cuda( float *input, float *output, int width, int height, f
                     c + (j + k_j)*channels + (i + k_i)*channels * width;
            
                 int kernel_index = k*channels*(2*k_width+1)*(2*k_width+1) + c*(2*k_width+1)*(2*k_width+1) + (k_i + k_width)* (2*k_width+1)+k_j + k_width;
-                output[output_idx] +=
+                tmp_output  +=
                     input[input_idx] * ckernel[kernel_index];
                     //h_kernel[k][c][k_i + k_width][k_j + k_width];
 
@@ -33,7 +35,7 @@ __global__ void conv_cuda( float *input, float *output, int width, int height, f
             }
           }
         }       
-       
+        output[output_idx] =tmp_output;
     return;
  }
 
