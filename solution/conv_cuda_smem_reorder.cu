@@ -80,6 +80,19 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
           (gmem_x >= width || gmem_y < 0) ? 0 : input[gmem_index];
     }
   }
+
+   // Copy the block data
+   int smem_x = threadIdx.x + k_width;
+   int smem_y = threadIdx.y + k_width;
+   int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
+   int gmem_y = blockIdx.y * blockDim.y + threadIdx.y;
+   for (int c = 0; c < channels; c++) {
+     int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+     int smem_index =
+     (smem_y * (blockDim.x + 2 * k_width) + smem_x)  + c*smem_2d_size;
+     sdata[smem_index] =
+         (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
+   }
   // Bottom Left
   if (threadIdx.x < k_width && threadIdx.y >= blockDim.y - k_width) {
     int smem_x = threadIdx.x;
@@ -138,18 +151,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
     }
   }
 
-  // Copy the block data
-  int smem_x = threadIdx.x + k_width;
-  int smem_y = threadIdx.y + k_width;
-  int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
-  int gmem_y = blockIdx.y * blockDim.y + threadIdx.y;
-  for (int c = 0; c < channels; c++) {
-    int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-    int smem_index =
-    (smem_y * (blockDim.x + 2 * k_width) + smem_x)  + c*smem_2d_size;
-    sdata[smem_index] =
-        (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
-  }
+ 
 
   __syncthreads();
 

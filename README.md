@@ -60,11 +60,18 @@ on GTX960m kernel time<br />
 2000x1000.jpg: 0.00899<br /> 
 780x585.jpg: 0.00216 <br />
 
+<h2>CUDA SMEM in , register output, cmem kernel 32x16 ,reorder SMEM, reorder SMEM copy  </h2> 
+on GTX960m kernel time<br />
+4000x3000.jpg: 0.0529 <br />
+2000x1000.jpg: 0.00899<br /> 
+780x585.jpg: 0.00216 <br />
+
+
 <h2>CUDA SMEM in , register output, cmem kernel 32x32 ,reorder SMEM </h2> 
 on GTX960m kernel time<br />
 4000x3000.jpg: 0.0577 <br />
-2000x1000.jpg: 0.0100<br /> 
-780x585.jpg: 0.00232 <br />
+780x585.jpg: 0.00214 <br />
+2000x1000.jpg: 0.00917<br /> 
 
 
 
