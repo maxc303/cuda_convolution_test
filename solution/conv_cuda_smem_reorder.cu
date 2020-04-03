@@ -1,4 +1,5 @@
 #include "helpers.h"
+__constant__ float ckernel[81];
 
 __global__ void conv_cuda(float *input, float *output, int width, int height,
                           float *kernel, int channels, int k_width,
@@ -169,7 +170,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
             k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
             c * (2 * k_width + 1) * (2 * k_width + 1) +
             k_i * (2 * k_width + 1) + k_j;
-        tmp_output += sdata[smem_index] * kernel[kernel_index];
+        tmp_output += sdata[smem_index] * ckernel[kernel_index];
       }
     }
   }
@@ -255,7 +256,7 @@ int main(int argc, char *argv[]) {
   }
   cudaMalloc((void **)&d_kernel, kernel_bytes);
   cudaMemcpy(d_kernel, h_kernel, kernel_bytes, cudaMemcpyHostToDevice);
-
+  cudaMemcpyToSymbol(ckernel, &h_kernel,kernel_bytes);
   int k_size = 3;
   int k_width = (k_size - 1) / 2;
 
@@ -269,7 +270,7 @@ int main(int argc, char *argv[]) {
   double timeStampA = getTimeStamp();
 
   conv_cuda<<<grid, block, smem_size>>>(d_input, d_output, width, height,
-                                        d_kernel, 3, k_width, kernels);
+                                        ckernel, 3, k_width, kernels);
 
   cudaDeviceSynchronize();
   double timeStampB = getTimeStamp();
