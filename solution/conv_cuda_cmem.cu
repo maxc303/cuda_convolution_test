@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
       // invoke Kernel
     int bx =32;
-    int by =32;
+    int by =16;
     dim3 block( bx, by ) ; // you will want to configure this
     dim3 grid( (width + block.x-1)/block.x, (height + block.y-1)/block.y, 3) ;
     printf("Grid : {%d, %d, %d} blocks. Blocks : {%d, %d} threads.\n", grid.x, grid.y,grid.z, block.x, block.y);

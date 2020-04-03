@@ -44,6 +44,8 @@ void save_image(const char *output_filename, float *buffer, int height,
 
 int main(int argc, char *argv[]) {
   // Init cudnn
+  cudaDeviceReset();
+
   cudnnHandle_t cudnn;
   cudnnCreate(&cudnn);
 
