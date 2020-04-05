@@ -12,17 +12,6 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
   extern __shared__ float sdata[];
 
   int smem_2d_size = (blockDim.x + 2*k_width)*(blockDim.y + 2*k_width);
-  // Return if out of bound, assign 0 to smem
-  if (i >= height || j >= width) {
-    int smem_x = threadIdx.x;
-    int smem_y = threadIdx.y;
-    for (int c = 0; c < channels; c++) {
-      int smem_index =
-          (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c*smem_2d_size;
-      sdata[smem_index] = 0;
-    }
-    return;
-  }
 
   // Copy GMEm to SMEM here
   // Left Overhang
@@ -155,7 +144,9 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
  
 
   __syncthreads();
-
+  if (i >= height || j >= width) {
+    return;
+  }
   float tmp_output = 0;
 
   for (int c = 0; c < channels; c++) {
@@ -229,7 +220,7 @@ int main(int argc, char *argv[]) {
 
   // invoke Kernel
   int bx = 32;
-  int by = 16;
+  int by = 32;
   dim3 block(bx, by); // you will want to configure this
   dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y,
             3);

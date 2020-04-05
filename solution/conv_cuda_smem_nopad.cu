@@ -10,17 +10,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
   int output_idx = i * width * kernels + j * kernels + k;
   extern __shared__ float sdata[];
 
-  // Return if out of bound, assign 0 to smem
-  if (i >= height || j >= width) {
-    int smem_x = threadIdx.x;
-    int smem_y = threadIdx.y;
-    for (int c = 0; c < channels; c++) {
-      int smem_index =
-          (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
-      sdata[smem_index] = 0;
-    }
-    return;
-  }
+
 
   // Copy GMEm to SMEM here
   // Left Overhang
@@ -152,6 +142,10 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
 
   __syncthreads();
 
+    // Return if out of bound, assign 0 to smem
+    if (i >= height || j >= width) {
+      return;
+    }
   float tmp_output = 0;
 
   for (int c = 0; c < channels; c++) {

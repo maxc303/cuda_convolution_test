@@ -11,22 +11,10 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
   int output_idx = i * width * kernels + j * kernels + k;
   extern __shared__ float sdata[];
   int smem_2d_size = (blockDim.x + 2 * k_width) * (blockDim.y + 2 * k_width);
-  
-  // Return if out of bound, assign 0 to smem
-//   if (i >= height || j >= width) {
-//     int smem_x = threadIdx.x + k_width;
-//     int smem_y = threadIdx.y + k_width;
-//     for (int c = 0; c < channels; c++) {
-//       int smem_index =
-//           (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-//       sdata[smem_index] = 0;
-//     }
-//     return;
-//   }
 
+  if (threadIdx.y < k_width) {
 
   // Top Overhang
-  if (threadIdx.y < k_width) {
     int smem_x = threadIdx.x + k_width;
     int smem_y = threadIdx.y;
     int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -38,6 +26,8 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
 
       sdata[smem_index] = (gmem_y < 0) ? 0 : input[gmem_index];
     }
+
+    
     // Top Left
     if (threadIdx.x < k_width) {
       int smem_x = threadIdx.x;
@@ -53,20 +43,20 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
       }
     }
 
-          // Top Right
-          if (threadIdx.y < k_width && threadIdx.x >= blockDim.x - k_width) {
-            int smem_x = threadIdx.x + 2 * k_width;
-            int smem_y = threadIdx.y;
-            int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
-            int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
-            for (int c = 0; c < channels; c++) {
-              int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-              int smem_index =
-                  (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-              sdata[smem_index] =
-                  (gmem_x >= width || gmem_y < 0) ? 0 : input[gmem_index];
-            }
-          }
+    // Top Right
+    if (threadIdx.y < k_width && threadIdx.x >= blockDim.x - k_width) {
+      int smem_x = threadIdx.x + 2 * k_width;
+      int smem_y = threadIdx.y;
+      int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
+      int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
+      for (int c = 0; c < channels; c++) {
+        int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+        int smem_index =
+            (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+        sdata[smem_index] =
+            (gmem_x >= width || gmem_y < 0) ? 0 : input[gmem_index];
+      }
+    }
   }
   // Copy GMEm to SMEM here
   // Left Overhang
@@ -84,7 +74,6 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
     }
   }
 
-      
   // Copy the block data
   int smem_x = threadIdx.x + k_width;
   int smem_y = threadIdx.y + k_width;
@@ -138,29 +127,28 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
           (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
       sdata[smem_index] = (gmem_x >= width) ? 0 : input[gmem_index];
     }
-
   }
-// Bottom Right
-if (threadIdx.x >= blockDim.x - k_width &&
-    threadIdx.y >= blockDim.y - k_width) {
-  int smem_x = threadIdx.x + 2 * k_width;
-  int smem_y = threadIdx.y + 2 * k_width;
-  int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
-  int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
-  for (int c = 0; c < channels; c++) {
-    int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-    int smem_index =
-        (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-    sdata[smem_index] =
-        (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
+  // Bottom Right
+  if (threadIdx.x >= blockDim.x - k_width &&
+      threadIdx.y >= blockDim.y - k_width) {
+    int smem_x = threadIdx.x + 2 * k_width;
+    int smem_y = threadIdx.y + 2 * k_width;
+    int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
+    int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
+    for (int c = 0; c < channels; c++) {
+      int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+      int smem_index =
+          (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+      sdata[smem_index] =
+          (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
+    }
   }
-}
   __syncthreads();
 
-    if (i >= height || j >= width) {
-   
+  if (i >= height || j >= width) {
     return;
   }
+  
   float tmp_output = 0;
 
   for (int c = 0; c < channels; c++) {
