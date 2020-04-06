@@ -12,100 +12,89 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
   extern __shared__ float sdata[];
   int smem_2d_size = (blockDim.x + 2 * k_width) * (blockDim.y + 2 * k_width);
 
-
-
-
   if (threadIdx.y < k_width) {
-
-      // Top Left
-  if (threadIdx.y < k_width && threadIdx.x < k_width) {
-    int smem_x = threadIdx.x;
-    int smem_y = threadIdx.y;
-    int gmem_x = blockIdx.x * blockDim.x + threadIdx.x - k_width;
-    int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
-    for (int c = 0; c < channels; c++) {
-      int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-      int smem_index =
-          (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-
-      sdata[smem_index] = (gmem_x < 0 || gmem_y < 0) ? 0 : input[gmem_index];
+    // Top Left
+    if (threadIdx.y < k_width && threadIdx.x < k_width) {
+      int smem_x = threadIdx.x;
+      int smem_y = threadIdx.y;
+      int gmem_x = blockIdx.x * blockDim.x + threadIdx.x - k_width;
+      int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
+      //Top Right
+      int smem_x1 = smem_x + blockDim.x + k_width;
+      int smem_y1 = smem_y;
+      int gmem_x1 = gmem_x + blockDim.x + k_width;
+      int gmem_y1 = gmem_y;
+      for (int c = 0; c < channels; c++) {
+        int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+        int smem_index =
+            (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+        sdata[smem_index] = (gmem_x < 0 || gmem_y < 0) ? 0 : input[gmem_index];
+        //Top right
+        int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
+        int smem_index1 =
+            (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) + c * smem_2d_size;
+        sdata[smem_index1] =
+            (gmem_x1 >= width || gmem_y1 < 0) ? 0 : input[gmem_index1];
+      }
     }
-  }
-  // Top Overhang
+    
+    // Top Overhang
     int smem_x = threadIdx.x + k_width;
     int smem_y = threadIdx.y;
     int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
     int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
-    //Left Overhang
+    // Left Overhang
     int smem_x1 = threadIdx.y;
     int smem_y1 = threadIdx.x + k_width;
     int gmem_x1 = blockIdx.x * blockDim.x + threadIdx.y - k_width;
     int gmem_y1 = blockIdx.y * blockDim.y + threadIdx.x;
     for (int c = 0; c < channels; c++) {
-        //Assign Top values
+      // Assign Top values
       int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
       int smem_index =
           (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
       sdata[smem_index] = (gmem_y < 0) ? 0 : input[gmem_index];
-       //Assign Left value
+      // Assign Left value
       int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
       int smem_index1 =
           (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) + c * smem_2d_size;
       sdata[smem_index1] = (gmem_x < 0) ? 0 : input[gmem_index1];
     }
-    
-    // Top Right
-    if (threadIdx.y < k_width && threadIdx.x >= blockDim.x - k_width) {
-      int smem_x = threadIdx.x + 2 * k_width;
-      int smem_y = threadIdx.y;
-      int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
-      int gmem_y = blockIdx.y * blockDim.y + threadIdx.y - k_width;
-      for (int c = 0; c < channels; c++) {
-        int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-        int smem_index =
-            (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-        sdata[smem_index] =
-            (gmem_x >= width || gmem_y < 0) ? 0 : input[gmem_index];
-      }
+  }
+
+ 
+  // Bottom Left
+  if (threadIdx.x < k_width && threadIdx.y >= blockDim.y - k_width) {
+    int smem_x = threadIdx.x;
+    int smem_y = threadIdx.y + 2 * k_width;
+    int gmem_x = blockIdx.x * blockDim.x + threadIdx.x - k_width;
+    int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
+    int smem_x1 = smem_x + blockDim.x + k_width;
+    int smem_y1 = smem_y;
+    int gmem_x1 = gmem_x + blockDim.x + k_width;
+    int gmem_y1 = gmem_y;
+    for (int c = 0; c < channels; c++) {
+      int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+      int smem_index =
+          (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+
+      sdata[smem_index] =
+          (gmem_x < 0 || gmem_y >= height) ? 0 : input[gmem_index];
+      int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
+      int smem_index1 =
+          (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) + c * smem_2d_size;
+      sdata[smem_index1] =
+          (gmem_x1 >= width || gmem_y1 >= height) ? 0 : input[gmem_index1];
     }
   }
-
-
-  // Copy the block data
-  int smem_x = threadIdx.x + k_width;
-  int smem_y = threadIdx.y + k_width;
-  int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
-  int gmem_y = blockIdx.y * blockDim.y + threadIdx.y;
-  for (int c = 0; c < channels; c++) {
-    int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-    int smem_index =
-        (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-    sdata[smem_index] =
-        (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
-  }
-    // Bottom Left
-    if (threadIdx.x < k_width && threadIdx.y >= blockDim.y - k_width) {
-        int smem_x = threadIdx.x;
-        int smem_y = threadIdx.y + 2 * k_width;
-        int gmem_x = blockIdx.x * blockDim.x + threadIdx.x - k_width;
-        int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
-        for (int c = 0; c < channels; c++) {
-          int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-          int smem_index =
-              (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-  
-          sdata[smem_index] =
-              (gmem_x < 0 || gmem_y >= height) ? 0 : input[gmem_index];
-        }
-      }
   // Bottom
   if (threadIdx.y >= blockDim.y - k_width) {
-      //Indexes for bottom padding
+    // Indexes for bottom padding
     int smem_x = threadIdx.x + k_width;
     int smem_y = threadIdx.y + 2 * k_width;
     int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
     int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
-    //Indexes for right side
+    // Indexes for right side
     int smem_x1 = threadIdx.y + 2 * k_width;
     int smem_y1 = threadIdx.x + k_width;
     int gmem_x1 = blockIdx.x * blockDim.x + threadIdx.y + k_width;
@@ -121,29 +110,40 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
           (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) + c * smem_2d_size;
       sdata[smem_index1] = (gmem_x1 >= width) ? 0 : input[gmem_index1];
     }
-
   }
-  // Bottom Right
-  if (threadIdx.x >= blockDim.x - k_width &&
-      threadIdx.y >= blockDim.y - k_width) {
-    int smem_x = threadIdx.x + 2 * k_width;
-    int smem_y = threadIdx.y + 2 * k_width;
-    int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
-    int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
-    for (int c = 0; c < channels; c++) {
-      int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-      int smem_index =
-          (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
-      sdata[smem_index] =
-          (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
-    }
-  }
+//   // Bottom Right
+//   if (threadIdx.x >= blockDim.x - k_width &&
+//       threadIdx.y >= blockDim.y - k_width) {
+//     int smem_x = threadIdx.x + 2 * k_width;
+//     int smem_y = threadIdx.y + 2 * k_width;
+//     int gmem_x = blockIdx.x * blockDim.x + threadIdx.x + k_width;
+//     int gmem_y = blockIdx.y * blockDim.y + threadIdx.y + k_width;
+//     for (int c = 0; c < channels; c++) {
+//       int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+//       int smem_index =
+//           (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+//       sdata[smem_index] =
+//           (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
+//     }
+//   }
+ // Copy the block data
+ int smem_x = threadIdx.x + k_width;
+ int smem_y = threadIdx.y + k_width;
+ int gmem_x = blockIdx.x * blockDim.x + threadIdx.x;
+ int gmem_y = blockIdx.y * blockDim.y + threadIdx.y;
+ for (int c = 0; c < channels; c++) {
+   int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
+   int smem_index =
+       (smem_y * (blockDim.x + 2 * k_width) + smem_x) + c * smem_2d_size;
+   sdata[smem_index] =
+       (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
+ }
   __syncthreads();
 
   if (i >= height || j >= width) {
     return;
   }
-  
+
   float tmp_output = 0;
 
   for (int c = 0; c < channels; c++) {
