@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
     std::cout << "File not exist" << std::endl;
     return 0;
   }
+  double timeStamp0 = getTimeStamp();
 
   // Input Descriptor
   cudnnTensorDescriptor_t input_descriptor;
@@ -149,6 +150,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Height and width:" << height << " x " << width << std::endl;
   // Mystery kernel
   const float kernel_template[3][3] = {{1, 1, 1}, {1, -8, 1}, {1, 1, 1}};
+  //const float kernel_template[3][3] = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 
   float h_kernel[3][3][3][3];
   for (int kernel = 0; kernel < 3; ++kernel) {
@@ -177,10 +179,13 @@ int main(int argc, char *argv[]) {
   double timeStampB = getTimeStamp();
   float *h_output = new float[image_bytes];
   cudaMemcpy(h_output, d_output, image_bytes, cudaMemcpyDeviceToHost);
+  double timeStamp1 = getTimeStamp();
 
 
 
   // Print result
+  std::cout << "Total process time: " << timeStamp1 - timeStamp0
+  << std::endl;
   std::cout << "Total convolution time: " << timeStampB - timeStampA
             << std::endl;
   std::cout << "Save Output to " << outputfile << std::endl;

@@ -14,7 +14,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
 
   if (threadIdx.y < k_width) {
     // Top Left
-    if (threadIdx.y < k_width && threadIdx.x < k_width) {
+    if (threadIdx.x < k_width) {
       int smem_x = threadIdx.x;
       int smem_y = threadIdx.y;
       int gmem_x = blockIdx.x * blockDim.x + threadIdx.x - k_width;
