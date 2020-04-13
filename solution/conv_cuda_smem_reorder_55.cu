@@ -170,7 +170,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
             k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
             c * (2 * k_width + 1) * (2 * k_width + 1) +
             k_i * (2 * k_width + 1) + k_j;
-        tmp_output += sdata[smem_index] * ckernel[kernel_index];
+        tmp_output += sdata[smem_index] * kernel[kernel_index];
       }
     }
   }
@@ -242,9 +242,9 @@ int main(int argc, char *argv[]) {
   // Mystery kernel
 
   const float kernel_template[5][5] = {{1, 1, 1, 1, 1},
-                                       {1, 4, 4, 4, 1},
-                                       {1, 4, 12, 4, 1},
-                                       {1, 4, 4, 4, 1},
+                                       {1, 1, 1, 1, 1},
+                                       {1, 1, -8, 1, 1},
+                                       {1, 1, 1, 1, 1},
                                        {1, 1, 1, 1, 1}};
   float *d_kernel;
   float h_kernel[3][3][5][5];
@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
   double timeStampA = getTimeStamp();
 
   conv_cuda<<<grid, block, smem_size>>>(d_input, d_output, width, height,
-                                        ckernel, 3, k_width, kernels);
+                                        d_kernel, 3, k_width, kernels);
 
   cudaDeviceSynchronize();
   double timeStampB = getTimeStamp();
