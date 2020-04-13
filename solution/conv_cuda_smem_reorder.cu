@@ -219,8 +219,8 @@ int main(int argc, char *argv[]) {
   cudaMemcpy(d_input, h_input, input_bytes, cudaMemcpyHostToDevice);
 
   // invoke Kernel
-  int bx = 32;
-  int by = 32;
+  int bx = 64;
+  int by = 16;
   dim3 block(bx, by); // you will want to configure this
   dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y,
             3);
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
   }
   cudaMalloc((void **)&d_kernel, kernel_bytes);
   cudaMemcpy(d_kernel, h_kernel, kernel_bytes, cudaMemcpyHostToDevice);
-  cudaMemcpyToSymbol(ckernel, &h_kernel,kernel_bytes);
+  cudaMemcpyToSymbol(d_kernel, &h_kernel,kernel_bytes);
   int k_size = 3;
   int k_width = (k_size - 1) / 2;
 
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
   double timeStampA = getTimeStamp();
 
   conv_cuda<<<grid, block, smem_size>>>(d_input, d_output, width, height,
-                                        ckernel, 3, k_width, kernels);
+                                        d_kernel, 3, k_width, kernels);
 
   cudaDeviceSynchronize();
   double timeStampB = getTimeStamp();

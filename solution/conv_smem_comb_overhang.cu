@@ -161,6 +161,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
     sdata[smem_index] =
         (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
   }
+
   __syncthreads();
 
   if (i >= height || j >= width) {

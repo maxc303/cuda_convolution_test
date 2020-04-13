@@ -1,4 +1,5 @@
 #include "helpers.h"
+__constant__ float ckernel[81];
 
 __global__ void conv_cuda(float *input, float *output, int width, int height,
                           float *kernel, int channels, int k_width,
@@ -23,10 +24,10 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
       int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
       int smem_index =
           (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
-
       sdata[smem_index] = (gmem_x < 0) ? 0 : input[gmem_index];
     }
   }
+
   // Top Overhang
   if (threadIdx.y < k_width) {
     int smem_x = threadIdx.x + k_width;
@@ -160,7 +161,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
             k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
             c * (2 * k_width + 1) * (2 * k_width + 1) +
             k_i * (2 * k_width + 1) + k_j;
-        tmp_output += sdata[smem_index] * kernel[kernel_index];
+        tmp_output += sdata[smem_index] * ckernel[kernel_index];
       }
     }
   }
@@ -218,7 +219,7 @@ int main(int argc, char *argv[]) {
   cudaMemcpy(d_input, h_input, input_bytes, cudaMemcpyHostToDevice);
 
   // invoke Kernel
-  int bx = 32;
+  int bx = 64;
   int by = 16;
   dim3 block(bx, by); // you will want to configure this
   dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y,
@@ -246,6 +247,7 @@ int main(int argc, char *argv[]) {
   }
   cudaMalloc((void **)&d_kernel, kernel_bytes);
   cudaMemcpy(d_kernel, h_kernel, kernel_bytes, cudaMemcpyHostToDevice);
+  cudaMemcpyToSymbol(d_kernel, &h_kernel,kernel_bytes);
 
   int k_size = 3;
   int k_width = (k_size - 1) / 2;
