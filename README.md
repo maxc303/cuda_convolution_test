@@ -18,23 +18,12 @@ on GTX960m kernel time<br />
 2000x1000.jpg: 0.0346<br /> 
 780x585.jpg: 0.00728 <br />
 
-<h2>CUDA constant memory Solution conv_cuda_cmem.cu</h2> 
-on GTX960m kernel time<br />
-4000x3000.jpg: 0.1725 <br />
-2000x1000.jpg: 0.0338<br /> 
-780x585.jpg: 0.00706 <br />
-
 <h2>CUDA register output, no padding conv_reg_nopad.cu</h2> 
 on GTX960m kernel time<br />
 4000x3000.jpg: 0.0799 <br />
 2000x1000.jpg: 0.0129<br /> 
 780x585.jpg: 0.00304 <br />
 
-<h2>CUDA register output, CMEM no padding conv_reg_cmem_nopad.cu</h2> 
-on GTX960m kernel time<br />
-4000x3000.jpg: 0.0763 <br />
-2000x1000.jpg: 0.0125<br /> 
-780x585.jpg: 0.00296 <br />
 
 <h2>CUDA register output, padded </h2> 
 on GTX960m kernel time<br />
