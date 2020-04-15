@@ -6,12 +6,13 @@ on GTX960m <br />
 2000x1000.jpg: 0.00891 <br />
 780x585.jpg: 0.00220 <br /><br />
 
-<h2>CPU Solution conv_cpu.cu</h2> 
+##CPU Solution conv_cpu.cu 
 CPU: i7-6700HQ<br />
 4000x3000.jpg: 7.45588 <br />
 2000x1000.jpg: 1.23983 <br /> 
 780x585.jpg: 0.27348 <br />
 
+##CUDA solution, direct algorithm
 <h2>CUDA naive Solution conv_cuda_naive.cu</h2> 
 on GTX960m kernel time<br />
 4000x3000.jpg: 0.1769 <br />
@@ -87,7 +88,7 @@ on GTX960m kernel time<br />
 2000x1000.jpg: 0.00757<br /> 
 780x585.jpg: 0.00174<br />
 
-<h2>CUDA SMEM in , register output, cmem kernel 32x32 ,reorder SMEM ,combine topleft&topright,faster order</h2> 
+###CUDA SMEM in , register output, cmem kernel 32x32 ,reorder SMEM ,combine topleft&topright,faster order
 on GTX960m kernel time<br />
 4000x3000.jpg: 0.0428<br />
 2000x1000.jpg: 0.00714<br /> 
