@@ -1,5 +1,6 @@
 #include "helpers.h"
 
+//CUDA Kernel function
 __global__ void conv_cuda(float *input, float *output, int width, int height,
                           float *kernel, int n_channels, int k_width,
                           int n_kernels) {

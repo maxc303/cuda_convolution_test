@@ -1,3 +1,0 @@
-/homes/c/cheny248/ece1782/cuda_conv/conv_cudnn/cudnn_build/CMakeFiles/rebuild_cache.dir
-/homes/c/cheny248/ece1782/cuda_conv/conv_cudnn/cudnn_build/CMakeFiles/edit_cache.dir
-/homes/c/cheny248/ece1782/cuda_conv/conv_cudnn/cudnn_build/CMakeFiles/conv_cudnn_test.dir

@@ -1,4 +1,5 @@
 #include "helpers.h"
+const float kernel_template[3][3] = {{1, 1, 1}, {1, -8, 1}, {1, 1, 1}};
 
 int main(int argc, char *argv[]) {
   char *outputfile = (char *)"cpu_out.png";
@@ -45,7 +46,6 @@ int main(int argc, char *argv[]) {
   //==================================
   // Mystery kernel
 
-  const float kernel_template[3][3] = {{1, 1, 1}, {1, -8, 1}, {1, 1, 1}};
 
   float h_kernel[3][3][3][3];
   for (int kernel = 0; kernel < 3; ++kernel) {

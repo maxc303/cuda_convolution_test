@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 
       std::cout << "Convolution algorithm: " <<convolution_algorithm << std::endl;
   size_t workspace_bytes = 0;
-//   convolution_algorithm = CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM;
-convolution_algorithm = CUDNN_CONVOLUTION_FWD_ALGO_DIRECT;
+   convolution_algorithm = CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM;
+//convolution_algorithm = CUDNN_CONVOLUTION_FWD_ALGO_DIRECT;
 
   checkCUDNN(cudnnGetConvolutionForwardWorkspaceSize(
       cudnn, input_descriptor, kernel_descriptor, convolution_descriptor,

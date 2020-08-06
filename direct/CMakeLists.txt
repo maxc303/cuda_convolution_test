@@ -1,57 +1,28 @@
 cmake_minimum_required(VERSION 2.8.9)
-project (conv_solution)
+project (conv_direct)
 
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpic")
 find_package(CUDA QUIET REQUIRED)
 
-set(CXXFLAGS
-	-fPIC)
-set(CUDA_HOST_COMPILER 
-  usr/bin/clang++-3.8
- )
 
 
-# Pass options to NVCC
-set(
-    CUDA_NVCC_FLAGS
-    ${CUDA_NVCC_FLAGS};
-	-ccbin clang-3.8
-    )
+add_library(helpers STATIC helpers.cpp)
 
-# Specify include directories
-include_directories(
-    
-	#Modify the path to local cudnn include
-	#/usr/include/opencv
-    #/nfs/ug/homes-2/c/cheny248/cuda/include
-    )
-
-# Specify library paths
-link_directories(
-	#Modify the path to local cudnn lib
-	#/nfs/ug/homes-2/c/cheny248/cuda/lib64
-
-    )
-
-
-
-# For compilation ...
-# Specify target & source files to compile it from
-cuda_add_executable(
-    conv_cpu_test
-    conv_cpu.cu
-
-    )
-
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
 # For linking ...
 # Specify target & libraries to link it with
-target_link_libraries(
-	conv_cpu_test
+link_libraries(
+    helpers
     -lcudnn
-	-lopencv_core 
-	-lopencv_imgproc 
+    -lopencv_core 
+    -lopencv_imgproc 
     -lopencv_highgui
-    )
+)
 
+#CPU test
+cuda_add_executable(conv_cpu_test conv_cpu.cu)
+
+#Naive CUDA test
+cuda_add_executable(conv_cuda_naive conv_cuda_naive.cu)
+
+#Register Output
+cuda_add_executable(conv_cuda_reg_out conv_cuda_reg_nopad.cu)
