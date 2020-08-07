@@ -1,2 +1,4 @@
 conv_cudnn/.vscode/*
 ./vscode/*
+direct_build/*
+cudnn_build/*

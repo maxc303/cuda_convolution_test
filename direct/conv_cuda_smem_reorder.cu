@@ -161,7 +161,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
             k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
             c * (2 * k_width + 1) * (2 * k_width + 1) +
             k_i * (2 * k_width + 1) + k_j;
-        tmp_output += sdata[smem_index] * ckernel[kernel_index];
+        tmp_output += sdata[smem_index] * kernel[kernel_index];
       }
     }
   }

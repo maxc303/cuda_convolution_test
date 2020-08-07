@@ -20,8 +20,6 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-
-
   //==================================
   // Define I/O sizes
   //==================================
@@ -38,14 +36,13 @@ int main(int argc, char *argv[]) {
   std::cout << "Padded dims is " << height_padded << "x" << width_padded
             << std::endl;
 
- float *h_input = (float *)image.data;
+  float *h_input = (float *)image.data;
   float *h_output = new float[output_bytes];
 
   //==================================
   // Define Kernel data
   //==================================
   // Mystery kernel
-
 
   float h_kernel[3][3][3][3];
   for (int kernel = 0; kernel < 3; ++kernel) {
@@ -61,7 +58,7 @@ int main(int argc, char *argv[]) {
   int k_size = 3;
   int k_width = (k_size - 1) / 2;
   //==================================
-  // CPU Convolution 
+  // CPU Convolution
   //==================================
 
   int input_idx = 0;
@@ -70,7 +67,7 @@ int main(int argc, char *argv[]) {
   for (int k = 0; k < kernels; k++) {
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-        output_idx = i*width*kernels + j*kernels + k;
+        output_idx = i * width * kernels + j * kernels + k;
         h_output[output_idx] = 0.0;
         // std::cout<< "Looping index "<< output_idx << std::endl;
         // Channel loop
@@ -82,13 +79,11 @@ int main(int argc, char *argv[]) {
                   j + k_j < width) {
 
                 input_idx =
-                    c + (j + k_j)*channels + (i + k_i)*channels * width;
- 
+                    c + (j + k_j) * channels + (i + k_i) * channels * width;
 
                 h_output[output_idx] +=
                     h_input[input_idx] *
                     h_kernel[k][c][k_i + k_width][k_j + k_width];
-
               }
             }
           }

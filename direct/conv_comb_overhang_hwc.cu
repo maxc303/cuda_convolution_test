@@ -26,13 +26,13 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
       int gmem_y1 = gmem_y;
       for (int c = 0; c < channels; c++) {
         int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
-          int smem_index =
-          (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
+        int smem_index =
+            (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
         sdata[smem_index] = (gmem_x < 0 || gmem_y < 0) ? 0 : input[gmem_index];
         // Top right
         int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
         int smem_index1 =
-          (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
+            (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
         sdata[smem_index1] =
             (gmem_x1 >= width || gmem_y1 < 0) ? 0 : input[gmem_index1];
       }
@@ -68,17 +68,19 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
       // Assign Left value
       int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
       int smem_index1 =
-      (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
+          (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
       sdata[smem_index1] = (gmem_x < 0) ? 0 : input[gmem_index1];
-      // //Assign Right 
+      // //Assign Right
       // int gmem_index2 = gmem_x2 * channels + gmem_y2 * width * channels + c;
       // int smem_index2 =
-      //     (smem_y2 * (blockDim.x + 2 * k_width) + smem_x2) + c * smem_2d_size;
+      //     (smem_y2 * (blockDim.x + 2 * k_width) + smem_x2) + c *
+      //     smem_2d_size;
       // sdata[smem_index2] = (gmem_x3 >= width) ? 0 : input[gmem_index2];
       // //Assign Bottom
       // int gmem_index3 = gmem_x3 * channels + gmem_y3 * width * channels + c;
       // int smem_index3 =
-      //     (smem_y3 * (blockDim.x + 2 * k_width) + smem_x3) + c * smem_2d_size;
+      //     (smem_y3 * (blockDim.x + 2 * k_width) + smem_x3) + c *
+      //     smem_2d_size;
       // sdata[smem_index3] = (gmem_y3 >= height) ? 0 : input[gmem_index3];
       // //Assign Bottom
     }
@@ -97,13 +99,13 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
     for (int c = 0; c < channels; c++) {
       int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
       int smem_index =
-      (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
+          (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
 
       sdata[smem_index] =
           (gmem_x < 0 || gmem_y >= height) ? 0 : input[gmem_index];
       int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
       int smem_index1 =
-      (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
+          (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
       sdata[smem_index1] =
           (gmem_x1 >= width || gmem_y1 >= height) ? 0 : input[gmem_index1];
     }
@@ -140,11 +142,11 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
     for (int c = 0; c < channels; c++) {
       int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
       int smem_index =
-      (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
+          (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
       sdata[smem_index] = (gmem_y >= height) ? 0 : input[gmem_index];
       int gmem_index1 = gmem_x1 * channels + gmem_y1 * width * channels + c;
       int smem_index1 =
-      (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
+          (smem_y1 * (blockDim.x + 2 * k_width) + smem_x1) * channels + c;
       sdata[smem_index1] = (gmem_x1 >= width) ? 0 : input[gmem_index1];
     }
   }
@@ -157,7 +159,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
   for (int c = 0; c < channels; c++) {
     int gmem_index = gmem_x * channels + gmem_y * width * channels + c;
     int smem_index =
-    (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
+        (smem_y * (blockDim.x + 2 * k_width) + smem_x) * channels + c;
     sdata[smem_index] =
         (gmem_x >= width || gmem_y >= height) ? 0 : input[gmem_index];
   }
@@ -177,7 +179,7 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
         smem_x = threadIdx.x + k_j;
         smem_y = threadIdx.y + k_i;
         int smem_index = c + smem_x * channels +
-        smem_y * channels * (blockDim.x + 2 * k_width);
+                         smem_y * channels * (blockDim.x + 2 * k_width);
         int kernel_index =
             k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
             c * (2 * k_width + 1) * (2 * k_width + 1) +

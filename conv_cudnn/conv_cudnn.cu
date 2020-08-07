@@ -116,7 +116,8 @@ int main(int argc, char *argv[]) {
       cudnn, input_descriptor, kernel_descriptor, convolution_descriptor,
       output_descriptor, CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
       /*memoryLimitInBytes=*/0, &convolution_algorithm));
-
+  //convolution_algorithm = CUDNN_CONVOLUTION_FWD_ALGO_DIRECT;
+  std::cout << "Cudnn Forward Algorithm Index :" << convolution_algorithm << std::endl;
   size_t workspace_bytes = 0;
 
   checkCUDNN(cudnnGetConvolutionForwardWorkspaceSize(
