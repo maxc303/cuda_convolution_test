@@ -161,9 +161,9 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
 
   }
 
-  float tmp_output0 = 0;
-  float tmp_output1 = 0;
-  float tmp_output2 = 0;
+  // float tmp_output0 = 0;
+  // float tmp_output1 = 0;
+  // float tmp_output2 = 0;
  
   for (int c = 0; c < channels; c++) {
     for (int k_i = 0; k_i <= 2 * k_width; k_i++) {
@@ -173,12 +173,13 @@ __global__ void conv_cuda(float *input, float *output, int width, int height,
         smem_y = threadIdx.y + k_i;
         int smem_index =
         c * smem_2d_size + smem_x + smem_y * (blockDim.x + 2 * k_width);
+        float smem_data = sdata[smem_index];
         for (int k =0;k<kernels;k++){
           int kernel_index =
           k * channels * (2 * k_width + 1) * (2 * k_width + 1) +
           c * (2 * k_width + 1) * (2 * k_width + 1) +
           k_i * (2 * k_width + 1) + k_j;
-          tmp_out[k]+=sdata[smem_index] * ckernel[kernel_index];
+          tmp_out[k]+=smem_data * ckernel[kernel_index];
         }
        
 

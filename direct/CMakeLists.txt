@@ -36,8 +36,11 @@ cuda_add_executable(conv_cuda_smem_reorder conv_cuda_smem_reorder.cu)
 #Shared memory combine corner checks
 cuda_add_executable(conv_cuda_smem_combine conv_cuda_smem_combine.cu)
 
-#Shared memory combine top/left and bottom/right
-cuda_add_executable(conv_smem_comb_further conv_comb_overhang_hwc.cu)
+#Shared memory combine corner checks + CMEM
+cuda_add_executable(conv_cuda_smem_cmem conv_cuda_final_cmem.cu)
 
 #Shared memory combine top/left and bottom/right
-cuda_add_executable(conv_cuda_final_55 conv_cuda_final_55.cu)
+cuda_add_executable(conv_smem_comb_further conv_smem_comb_overhang.cu)
+
+#Shared memory combine top/left and bottom/right
+cuda_add_executable(conv_cuda_55 conv_cuda_smem_reorder_55.cu)
