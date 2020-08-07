@@ -10,7 +10,7 @@ An edge detector is taken as an example for the forward convolution.
 
 The **/conv_cudnn** directory has the CUDNN version of edge detector as the reference.
 
-The **/direct** directoy has some implementations of direct convolution. Starting from CPU convolution and naive CUDA solution, we can see how some CUDA features can accelerate the forward convolution task.
+The **/direct** directoy has some examples of direct convolution. Starting from CPU convolution and naive CUDA solution, we can see how some CUDA features can accelerate the forward convolution task.
 
 ## Sample 
 
@@ -101,7 +101,7 @@ Added register for block output, reduce writing to global memory access.
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 1126e-3 | 4803e-3  | 2995e-2   |
+| Kernel time     | 1126e-3 | 4803e-3  | 2995e-2   |
 
 ### CUDA solution + SMEM + register output (/direct/conv_cuda_smem_nopad.cu)
 
@@ -116,7 +116,7 @@ The kernel function become much more compliated due to the boundary and padding 
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 8249e-4 | 3399e-3  | 2085e-2   |
+| Kernel time     | 8249e-4 | 3399e-3  | 2085e-2   |
 
 ### CUDA solution + reorder SMEM copy + register output (/direct/conv_cuda_smem_reorder.cu)
 <img src="./images/SMEM_order1.png" width="300" />
@@ -131,20 +131,20 @@ Also, the block size 64x16 is found to be faster than 32x32.
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 7801e-4 | 3278e-3  | 1991e-2   |
+| Kernel time      | 7801e-4 | 3278e-3  | 1991e-2   |
 
 ### CUDA solution + reorder SMEM copy and combine corner copy + register output (/direct/conv_cuda_smem_reorder.cu)
 
 Combine the boundry checks in the block corners, which should reduce the branches in the CUDA kernel function.
 Speed Up ~2.2 than naive CUDA solution. 
 <pre>
-    ./conv_cuda_smem_reorder ../images/780x585.jpg
+    ./conv_cuda_smem_combine ../images/780x585.jpg
 </pre>
 
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 7789e-4 | 3274e-3  | 1997e-2   |
+| Kernel time     | 7789e-4 | 3274e-3  | 1997e-2   |
 
 ### *Further combining SMEM copying
 
@@ -156,7 +156,7 @@ Combine the top/left and bottom/right padding copying to reduce code divergence.
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 8130e-4 | 3274e-3  | 1997e-2   |
+| Kernel time     | 8130e-4 | -  | -  |
 
 ### *Constant Memory for Kernel(filter) (/direct/conv_cuda_final_cmem.cu)
 
@@ -165,12 +165,12 @@ This change boost the performance and the kernel time is getting closed to CUDNN
 
 Some other techinques such as loop unrolling should also significantly improve the performance but they also required some known dimensions.
 <pre>
-    ./conv_cuda_smem_reorder ../images/780x585.jpg
+    ./conv_cuda_smem_cmem ../images/780x585.jpg
 </pre>
 
 Kernel time :
 |  Image Size | 780x585 | 2000x1000 | 4000x3000 |
 |-----------------------|---------|-----------|-----------|
-| CUDA + reg      | 4229e-4 | 1724e-3  | 1019e-2   |
+| Kernel time     | 4229e-4 | 1724e-3  | 1019e-2   |
 
 
